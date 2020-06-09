@@ -1,21 +1,23 @@
 import numpy as np
 
 class Particle:
-    def __init__(self, timesteps, mass=1, charge=1, force=np.zeros(timesteps.size), dt=timesteps.size / 1000):
+    def __init__(self, dt, mass=1, charge=1, force=[np.zeros(3)]):
         self.mass = mass
         self.charge = charge
-        self.timesteps = timesteps
-        self.force = force
+        self.force = force  # net force on the particle
         self.dt = dt
 
-        # TODO instead of fixing the size of the numpy arrays, we can keep it open-ended and
-        # TODO just append the values to the end of it. We might have to create x, y, and z for each though
-        self.pos = np.zeros((self.timesteps.size, 3))
-        self.vel = np.zeros((self.timesteps.size, 3))
-        self.accel = np.zeros((self.timesteps.size, 3))
-        self.force = np.zeros((self.timesteps.size, 3))  # net force on the particle
+        self.pos = None
+        self.vel = [np.zeros(np.shape(force))]
+        self.accel = [np.zeros(np.shape(force))]
 
     def update(self):
-        self.accel - self.force / self.mass
-        self.vel = self.accel * self.dt
-        self.pos = self.vel * self.dt
+        # self.accel = np.append(self.accel, self.force[-1] / self.mass)
+        self.accel.append(self.force[-1] / self.mass)
+
+        # self.vel = np.append(self.vel, self.vel[-1] + self.accel[-1] * self.dt)
+        self.vel.append(self.vel[-1] + self.accel[-1] * self.dt)
+
+        # self.pos = np.append(self.pos, self.pos[-1]+self.vel[-1]*self.dt)
+        self.pos.append(self.pos[-1]+self.vel[-1]*self.dt)
+
