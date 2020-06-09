@@ -34,7 +34,7 @@ class MainCycle:
     # TODO revise the positions that we set up
     def set_positions(self):  # sets INITIAL positions of particles as (1,0,0) , (2,0,0) ...
         for i in range(len(self.particle_list)):
-            set_pos = np.random.rand(3)
+            set_pos = [np.random.rand(3)]
             self.particle_list[i].pos = (set_pos/np.linalg.norm(set_pos))*1.01
 
     def plot_sphere(self):
@@ -47,9 +47,9 @@ class MainCycle:
     def plot_particles(self):
         particle_plots = []
         for i in range(len(self.particle_list)):
-            x = 0.05 * np.outer(np.cos(phi), np.sin(theta)) + self.particle_list[i].pos[0]
-            y = 0.05 * np.outer(np.sin(phi), np.sin(theta)) + self.particle_list[i].pos[1]
-            z = 0.05 * np.outer(np.ones(np.size(phi)), np.cos(theta)) + self.particle_list[i].pos[2]
+            x = 0.05 * np.outer(np.cos(phi), np.sin(theta)) + self.particle_list[i].pos[0][0]
+            y = 0.05 * np.outer(np.sin(phi), np.sin(theta)) + self.particle_list[i].pos[0][1]
+            z = 0.05 * np.outer(np.ones(np.size(phi)), np.cos(theta)) + self.particle_list[i].pos[0][2]
             particle_plots.append(mlab.mesh(x, y, z, colormap="autumn"))
         self.particle_plots = particle_plots
 
