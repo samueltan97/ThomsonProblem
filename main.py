@@ -28,23 +28,20 @@ class MainCycle:
     def set_positions(self):  # sets INITIAL positions of particles as (1,0,0) , (2,0,0) ...
         for i in range(len(self.particle_list)):
             self.particle_list[i].pos = [np.array([i/10, 0, 0])]
-        print("first position", self.particle_list[0].pos)
-
 
     # TODO I changed the way it iterates by updating every force to make it bidirectional. Less iterations ftw
     def calc_forces(self, particle_list):  # calcs forces between particles
         for i in range(len(particle_list)):
             for j in range(i+1, len(particle_list)):
                 sep = particle_list[i].pos[-1] - particle_list[j].pos[-1]
-                particle_list[i].force = np.append(particle_list[i].force, particle_list[i].force[-1] + sep / (np.linalg.norm(sep)) ** 3)
-                particle_list[j].force = np.append(particle_list[j].force, particle_list[i].force[-1] - sep / (np.linalg.norm(sep)) ** 3)
-
-        print(particle_list[0].force[-1], particle_list[1].force[-1])
+                particle_list[i].force = np.vstack((particle_list[i].force, sep / (np.linalg.norm(sep)) ** 3))
+                particle_list[j].force = np.vstack((particle_list[j].force, -sep / (np.linalg.norm(sep)) ** 3))
 
     def iterate_cycle(self, particle_count):
         self.calc_forces(self.particle_list)
         for i in range(particle_count):
             self.particle_list[i].update()
+        print(self.particle_list[0].pos[-1], "  ", self.particle_list[1].pos[-1])
 
     def start_cycle(self):
         self.set_positions()

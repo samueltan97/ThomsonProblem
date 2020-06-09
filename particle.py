@@ -6,18 +6,11 @@ class Particle:
         self.charge = charge
         self.force = force  # net force on the particle
         self.dt = dt
-
-        self.pos = None
-        self.vel = [np.zeros(np.shape(force))]
-        self.accel = [np.zeros(np.shape(force))]
+        self.pos = [np.zeros(3)]
+        self.vel = [np.zeros(3)]
+        self.accel = [np.zeros(3)]
 
     def update(self):
-        # self.accel = np.append(self.accel, self.force[-1] / self.mass)
-        self.accel.append(self.force[-1] / self.mass)
-
-        # self.vel = np.append(self.vel, self.vel[-1] + self.accel[-1] * self.dt)
-        self.vel.append(self.vel[-1] + self.accel[-1] * self.dt)
-
-        # self.pos = np.append(self.pos, self.pos[-1]+self.vel[-1]*self.dt)
-        self.pos.append(self.pos[-1]+self.vel[-1]*self.dt)
-
+        self.accel = np.vstack((self.accel, self.force[-1] / self.mass))
+        self.vel = np.vstack((self.vel, self.vel[-1] + self.accel[-1] * self.dt))
+        self.pos = np.vstack((self.pos, self.pos[-1] + self.vel[-1] * self.dt))
