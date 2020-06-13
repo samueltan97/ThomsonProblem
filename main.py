@@ -33,9 +33,15 @@ class MainCycle:
     def calc_forces(self, particle_list):  # calcs forces between particles
         for i in range(len(particle_list)):
             for j in range(i+1, len(particle_list)):
+                #sep = particle_list[i].pos[-1] - particle_list[j].pos[-1]
+                #particle_list[i].force = np.vstack((particle_list[i].force, sep / (np.linalg.norm(sep)) ** 3))
+                #particle_list[j].force = np.vstack((particle_list[j].force, -sep / (np.linalg.norm(sep)) ** 3))
                 sep = particle_list[i].pos[-1] - particle_list[j].pos[-1]
-                particle_list[i].force = np.vstack((particle_list[i].force, sep / (np.linalg.norm(sep)) ** 3))
-                particle_list[j].force = np.vstack((particle_list[j].force, -sep / (np.linalg.norm(sep)) ** 3))
+                radius = particle_list[i].pos
+                force = np.dot(sep/(np.linalg.norm(sep) ** 3), radius)*(sep/np.linalg.norm(sep))
+                particle_list[i].force = np.vstack((particle_list[i].force, force))
+                radius = (particle_list[j].pos - center)
+                particle_list[j].force = np.vstack((particle_list[j].force, -force))
 
     def iterate_cycle(self, particle_count):
         self.calc_forces(self.particle_list)
