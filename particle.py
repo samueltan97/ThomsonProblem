@@ -11,6 +11,15 @@ class Particle:
         self.accel = [np.zeros(3)]
 
     def update(self):
+
         self.accel = np.vstack((self.accel, self.force[-1] / self.mass))
-        self.vel = np.vstack((self.vel, self.vel[-1] + self.accel[-1] * self.dt))
-        self.pos = np.vstack((self.pos, self.pos[-1] + self.vel[-1] * self.dt))
+        radius = self.pos[-1]
+
+        new_vel = (self.vel[-1] + self.accel[-1] * self.dt) - np.dot((self.vel[-1] + self.accel[-1] * self.dt), radius)*(radius/np.linalg.norm(radius))
+        self.vel = np.vstack((self.vel, new_vel))
+
+        new_pos = (self.vel[-1] * self.dt) - np.dot((self.vel[-1] * self.dt), radius)*(radius/np.linalg.norm(radius))
+        self.pos = np.vstack((self.pos, self.pos[-1] + new_pos))
+
+        #self.vel = np.vstack((self.vel, self.vel[-1] + self.accel[-1] * self.dt))
+        #self.pos = np.vstack((self.pos, self.pos[-1] + self.vel[-1] * self.dt))

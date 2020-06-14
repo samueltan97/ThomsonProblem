@@ -37,7 +37,7 @@ class MainCycle:
             set_pos = [np.random.rand(3)]
             self.particle_list[i].pos = (set_pos/np.linalg.norm(set_pos))*1.01
         #print(np.linalg.norm(self.particle_list[0].pos), "  ", np.linalg.norm(self.particle_list[1].pos))
-	
+
 
     def plot_sphere(self):
         x = 1 * np.outer(np.cos(phi), np.sin(theta))
@@ -59,15 +59,13 @@ class MainCycle:
     def calc_forces(self, particle_list):  # calcs forces between particles
         for i in range(len(particle_list)):
             for j in range(i+1, len(particle_list)):
-                #sep = particle_list[i].pos[-1] - particle_list[j].pos[-1]
-                #particle_list[i].force = np.vstack((particle_list[i].force, sep / (np.linalg.norm(sep)) ** 3))
-                #particle_list[j].force = np.vstack((particle_list[j].force, -sep / (np.linalg.norm(sep)) ** 3))
                 sep = particle_list[i].pos[-1] - particle_list[j].pos[-1]
-                radius = particle_list[i].pos
-                force = np.dot(sep/(np.linalg.norm(sep) ** 3), radius)*(sep/np.linalg.norm(sep))
-                particle_list[i].force = np.vstack((particle_list[i].force, force))
-                radius = (particle_list[j].pos - center)
-                particle_list[j].force = np.vstack((particle_list[j].force, -force))
+                i_radius = particle_list[i].pos[-1]
+                j_radius = particle_list[j].pos[-1]
+                i_force = sep / (np.linalg.norm(sep)) ** 3 - np.dot(sep/(np.linalg.norm(sep) ** 3), i_radius)*(i_radius/np.linalg.norm(i_radius))
+                j_force = -sep / (np.linalg.norm(sep)) ** 3 - np.dot(-sep/(np.linalg.norm(sep) ** 3), j_radius)*(j_radius/np.linalg.norm(j_radius))
+                particle_list[i].force = np.vstack((particle_list[i].force, i_force))
+                particle_list[j].force = np.vstack((particle_list[j].force, j_force))
 
     def update_plot(self):
         for i in range(len(self.particle_list)):
