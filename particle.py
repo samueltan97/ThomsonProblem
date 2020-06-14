@@ -13,4 +13,6 @@ class Particle:
     def update(self):
         self.accel = np.vstack((self.accel, self.force[-1] / self.mass))
         self.vel = np.vstack((self.vel, self.vel[-1] + self.accel[-1] * self.dt))
-        self.pos = np.vstack((self.pos, self.pos[-1] + self.vel[-1] * self.dt))
+        new_pos = self.pos[-1] + self.vel[-1] * self.dt
+        p = (new_pos/np.linalg.norm(new_pos))*1.01
+        self.pos = np.vstack((self.pos, p))
