@@ -55,7 +55,6 @@ class MainCycle:
             particle_plots.append(mlab.mesh(x, y, z, colormap="autumn"))
         self.particle_plots = particle_plots
 
-    # TODO I changed the way it iterates by updating every force to make it bidirectional. Less iterations ftw
     def calc_forces(self, particle_list):  # calcs forces between particles
         for i in range(len(particle_list)):
             for j in range(i+1, len(particle_list)):
@@ -66,6 +65,7 @@ class MainCycle:
                 j_force = -sep / (np.linalg.norm(sep)) ** 3 - np.dot(-sep/(np.linalg.norm(sep) ** 3), j_radius)*(j_radius/np.linalg.norm(j_radius))
                 particle_list[i].force = np.vstack((particle_list[i].force, i_force))
                 particle_list[j].force = np.vstack((particle_list[j].force, j_force))
+
 
     def update_plot(self):
         for i in range(len(self.particle_list)):
