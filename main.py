@@ -4,6 +4,7 @@ import numpy as np
 import sys
 from particle import Particle
 from mayavi import mlab
+import matplotlib.pyplot as plt
 
 phi = np.linspace(0, 2*np.pi, 100)
 theta = np.linspace(0, np.pi, 100)
@@ -22,6 +23,7 @@ class MainCycle:
             self.counter = np.append(self.counter, current_counter)
             sleep(period)
             callback(*args)
+
 
     def set_interval(self, period, callback, *args):
         Thread(target=self.call_at_interval, args=(period, callback, args)).start()
@@ -92,6 +94,8 @@ class MainCycle:
         self.plot_sphere()
         self.plot_particles()
         self.set_interval(self.delta_t, self.iterate_cycle, time_duration)
+        plt.plot(self.counter, self.particle_list[0].pos)
+        plt.show()
 
 
 if __name__ == "__main__":
