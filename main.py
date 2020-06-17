@@ -13,12 +13,12 @@ class MainCycle:
     def __init__(self, particle_count, delta_t):
         self.particle_count = int(particle_count)
         self.delta_t = float(delta_t)
+        self.counter = 0
         self.make_particle_list()
 
     def call_at_interval(self, period, callback, args):
-        counter = 0
-        while counter <= int(args[0]):
-            counter += period
+        while self.counter <= int(args[0]):
+            self.counter += period
             sleep(period)
             callback(*args)
 
