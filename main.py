@@ -13,10 +13,13 @@ class MainCycle:
     def __init__(self, particle_count, delta_t):
         self.particle_count = int(particle_count)
         self.delta_t = float(delta_t)
+        self.counter = np.array([0])
         self.make_particle_list()
 
     def call_at_interval(self, period, callback, args):
-        while True:
+        while self.counter[-1] <= int(args[0]):
+            current_counter = self.counter[-1] + period
+            self.counter = np.append(self.counter, current_counter)
             sleep(period)
             callback(*args)
 
@@ -61,8 +64,9 @@ class MainCycle:
                 sep = particle_list[i].pos[-1] - particle_list[j].pos[-1]
                 i_radius = particle_list[i].pos[-1]
                 j_radius = particle_list[j].pos[-1]
-                i_force = sep / (np.linalg.norm(sep)) ** 3 - np.dot(sep/(np.linalg.norm(sep) ** 3), i_radius)*(i_radius/np.linalg.norm(i_radius))
-                j_force = -sep / (np.linalg.norm(sep)) ** 3 - np.dot(-sep/(np.linalg.norm(sep) ** 3), j_radius)*(j_radius/np.linalg.norm(j_radius))
+                force = sep / (np.linalg.norm(sep)) ** 3
+                i_force = force - np.dot(force, i_radius)*(i_radius/np.linalg.norm(i_radius))
+                j_force = -force - np.dot(-force, j_radius)*(j_radius/np.linalg.norm(j_radius))
                 particle_list[i].force = np.vstack((particle_list[i].force, i_force))
                 particle_list[j].force = np.vstack((particle_list[j].force, j_force))
 
@@ -73,23 +77,23 @@ class MainCycle:
             y = 0.05 * np.outer(np.sin(phi), np.sin(theta)) + self.particle_list[i].pos[-1][1]
             z = 0.05 * np.outer(np.ones(np.size(phi)), np.cos(theta)) + self.particle_list[i].pos[-1][2]
             self.particle_plots[i].mlab_source.trait_set(x=x, y=y, z=z)
-        #print(np.linalg.norm(self.particle_list[0].pos), "  ", np.linalg.norm(self.particle_list[1].pos))
+        print(np.linalg.norm(self.particle_list[0].pos), "  ", np.linalg.norm(self.particle_list[1].pos))
 
-    def iterate_cycle(self, particle_count):
+    def iterate_cycle(self, time_duration):
         self.calc_forces(self.particle_list)
-        for i in range(particle_count):
+        for i in range(self.particle_count):
             self.particle_list[i].update()
         #print(self.particle_list[0].pos[-1], "  ", self.particle_list[1].pos[-1])
-        print(np.linalg.norm(self.particle_list[0].pos[-1]), "  ", np.linalg.norm(self.particle_list[1].pos[-1]))
+        # print(np.linalg.norm(self.particle_list[0].pos[-1]), "  ", np.linalg.norm(self.particle_list[1].pos[-1]))
         self.update_plot()
 
-    def start_cycle(self):
+    def start_cycle(self, time_duration):
         self.set_positions()
         self.plot_sphere()
         self.plot_particles()
-        self.set_interval(self.delta_t, self.iterate_cycle, self.particle_count)
+        self.set_interval(self.delta_t, self.iterate_cycle, time_duration)
 
 
 if __name__ == "__main__":
-    # first arg will be number of particles and second arg will be delta T in seconds
-    MainCycle(sys.argv[1], sys.argv[2]).start_cycle()
+    # first arg will be number of particles and second arg will be delta T in seconds and third arg will be total duration
+    MainCycle(sys.argv[1], sys.argv[2]).start_cycle(sys.argv[3])

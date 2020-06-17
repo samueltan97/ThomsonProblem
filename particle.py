@@ -10,12 +10,24 @@ class Particle:
         self.vel = [np.zeros(3)]
         self.accel = [np.zeros(3)]
 
+   
+    def velocity_constraint(self,vel, radius):
+        vel = vel - np.dot(vel, radius)*radius/np.linalg.norm(radius)  
+        return vel
+    
+    def position_constraint(self,pos, radius):
+        pos = pos - np.dot(pos, radius)*radius/np.linalg.norm(radius)
+        
+        
     def update(self):
 
         self.accel = np.vstack((self.accel, self.force[-1] / self.mass))
         radius = self.pos[-1]
 
-        new_vel = (self.vel[-1] + self.accel[-1] * self.dt) - np.dot((self.vel[-1] + self.accel[-1] * self.dt), radius)*(radius/np.linalg.norm(radius))
+       # new_vel = (self.vel[-1] + self.accel[-1] * self.dt) - np.dot((self.vel[-1] + self.accel[-1] * self.dt), radius)*(radius/np.linalg.norm(radius))
+        
+        new_vel = self.vel[-1] + self.accel[-1]*self.dt
+        new_vel = self.velocity_constraint(new_vel, radius)        
         self.vel = np.vstack((self.vel, new_vel))
 
         new_pos = self.pos[-1] + (self.vel[-1] * self.dt)
@@ -23,7 +35,6 @@ class Particle:
         # new_pos = (self.vel[-1] * self.dt) - np.dot((self.vel[-1] * self.dt), radius)*(radius/np.linalg.norm(radius))
         # self.pos = np.vstack((self.pos, self.pos[-1] + new_pos))
         self.pos = np.vstack((self.pos, new_pos))
-
 
         #self.vel = np.vstack((self.vel, self.vel[-1] + self.accel[-1] * self.dt))
         #self.pos = np.vstack((self.pos, self.pos[-1] + self.vel[-1] * self.dt))
