@@ -1,10 +1,8 @@
 from threading import Thread
 from time import sleep
 import numpy as np
-from scipy.special import comb
 import sys
 from particle import Particle
-import matplotlib.pyplot as plt
 from mayavi import mlab
 
 phi = np.linspace(0, 2*np.pi, 100)
@@ -16,9 +14,6 @@ class MainCycle:
         self.particle_count = int(particle_count)
         self.delta_t = float(delta_t)
         self.counter = np.array([0])
-        self.potential_energy = np.array([0])
-        self.forces = np.zeros(shape=(int(int(sys.argv[3])/self.delta_t)+1, comb(self.particle_count, 2, exact=True)))
-        self.separation = np.zeros(shape=(int(int(sys.argv[3])/self.delta_t)+1, comb(self.particle_count, 2, exact=True)))
         self.make_particle_list()
 
     def call_at_interval(self, period, callback, args):
@@ -51,6 +46,7 @@ class MainCycle:
 
     def plot_particles(self): # plots INITIAL positions of particles
         particle_plots = []
+        force_plots = []
         for i in range(len(self.particle_list)):
             x = 0.05 * np.outer(np.cos(phi), np.sin(theta)) + self.particle_list[i].pos[0][0]
             y = 0.05 * np.outer(np.sin(phi), np.sin(theta)) + self.particle_list[i].pos[0][1]
@@ -61,26 +57,16 @@ class MainCycle:
                 particle_plots.append(mlab.mesh(x, y, z, colormap="autumn"))
         self.particle_plots = particle_plots
 
-    def calc_forces(self, particle_list):  # calcs forces between particles
-        current_separation = 0
-        energy = 0
-        sum_forces = 0
-        counter = 0
+    def calc_forces(self, particle_list):
         for i in range(len(particle_list)):
-            for j in range(i+1, len(particle_list)):
+            total_force = 0
+            for j in range(len(particle_list)):
                 sep = particle_list[i].pos[-1] - particle_list[j].pos[-1]
-                i_radius = particle_list[i].pos[-1]
-                j_radius = particle_list[j].pos[-1]
-                force = sep / (np.linalg.norm(sep)) ** 3
-                i_force = force - np.dot(force, i_radius)*(i_radius/np.linalg.norm(i_radius))
-                j_force = -force - np.dot(-force, j_radius)*(j_radius/np.linalg.norm(j_radius))
-                particle_list[i].force = np.vstack((particle_list[i].force, i_force))
-                particle_list[j].force = np.vstack((particle_list[j].force, j_force))
-                energy = energy + 1/np.linalg.norm(sep)
-                self.separation[int(self.counter[-1]/self.delta_t)][counter] = np.linalg.norm(sep)
-                self.forces[int(self.counter[-1]/self.delta_t)][counter] = np.linalg.norm(i_force)
-                counter = counter + 1
-        self.potential_energy = np.append(self.potential_energy, energy)
+                radius = particle_list[i].pos[-1]
+                if i!=j:
+                    force = sep / (np.linalg.norm(sep)) ** 3
+                    total_force = total_force + (force - np.dot(force, radius)*(radius/np.linalg.norm(radius)))
+            particle_list[i].force = np.vstack((particle_list[i].force, total_force))
 
     def update_plot(self):
         for i in range(len(self.particle_list)):
@@ -90,18 +76,18 @@ class MainCycle:
             self.particle_plots[i].mlab_source.trait_set(x=x, y=y, z=z)
 
     def relax(arr, relax_mask):
-    '''relaxation method used to fill in gaps in arrays'''
-    keep_same = arr[relax_mask]
-    first = arr[0]
-    last = arr[-1]    
-    
-    arr = (np.roll(arr,-1, axis=0) + np.roll(arr,1,axis=0))/2
-    
-    arr[relax_mask] = keep_same
-    arr[0] = first
-    arr[-1] = last
-    return arr
-            
+        '''relaxation method used to fill in gaps in arrays'''
+        keep_same = arr[relax_mask]
+        first = arr[0]
+        last = arr[-1]
+
+        arr = (np.roll(arr,-1, axis=0) + np.roll(arr,1,axis=0))/2
+
+        arr[relax_mask] = keep_same
+        arr[0] = first
+        arr[-1] = last
+        return arr
+
     def iterate_cycle(self, time_duration):
         self.calc_forces(self.particle_list)
         for i in range(self.particle_count):
@@ -113,16 +99,6 @@ class MainCycle:
         self.plot_sphere()
         self.plot_particles()
         self.set_interval(self.delta_t, self.iterate_cycle, time_duration)
-        counter = 0
-        for i in range(len(self.particle_list)):
-            for j in range(i+1, len(self.particle_list)):
-                plt.plot(self.counter, self.separation[:,counter], label="sep "+str(i)+"-"+str(j))
-                plt.plot(self.counter, self.forces[:,counter], label="force "+str(i)+"-"+str(j))
-                counter = counter+1
-        plt.plot(self.counter, self.potential_energy, label="energy")
-        plt.legend()
-        plt.show()
-
 
 if __name__ == "__main__":
     # first arg will be number of particles and second arg will be delta T in seconds and third arg will be total duration in seconds
