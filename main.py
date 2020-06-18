@@ -89,6 +89,19 @@ class MainCycle:
             z = 0.05 * np.outer(np.ones(np.size(phi)), np.cos(theta)) + self.particle_list[i].pos[-1][2]
             self.particle_plots[i].mlab_source.trait_set(x=x, y=y, z=z)
 
+    def relax(arr, relax_mask):
+    '''relaxation method used to fill in gaps in arrays'''
+    keep_same = arr[relax_mask]
+    first = arr[0]
+    last = arr[-1]    
+    
+    arr = (np.roll(arr,-1, axis=0) + np.roll(arr,1,axis=0))/2
+    
+    arr[relax_mask] = keep_same
+    arr[0] = first
+    arr[-1] = last
+    return arr
+            
     def iterate_cycle(self, time_duration):
         self.calc_forces(self.particle_list)
         for i in range(self.particle_count):
