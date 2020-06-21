@@ -20,7 +20,8 @@ class MainCycle:
         self.make_particle_list()
 
     def call_at_interval(self, period, callback, args):
-        while self.counter[-1] < int(args[0]):
+        # while self.counter[-1] < int(args[0]):
+        while True:
             current_counter = round(self.counter[-1] + period, 3)
             self.counter = np.append(self.counter, current_counter)
             sleep(period)
