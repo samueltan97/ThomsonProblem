@@ -1,4 +1,5 @@
 import numpy as np
+import math
 
 class Particle:
     def __init__(self, dt, mass=1, charge=1, force=[np.zeros(3)]):
@@ -11,7 +12,7 @@ class Particle:
         self.accel = [np.zeros(3)]
 
     def velocity_constraint(self, vel, radius):
-        vel = vel - np.dot(vel, radius)*radius/np.linalg.norm(radius)
+        vel = 99.7*self.dt*(vel - np.dot(vel, radius)*radius/np.linalg.norm(radius))
         return vel
 
     def position_constraint(self, pos):
