@@ -16,7 +16,7 @@ class Particle:
         return vel
 
     def position_constraint(self, pos):
-        pos = 1.01 * pos / (np.linalg.norm(pos))
+        pos = pos / (np.linalg.norm(pos))
         return pos
 
     def update(self):
