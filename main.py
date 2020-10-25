@@ -32,7 +32,7 @@ class MainCycle:
 
     def set_interval(self, period, callback, *args):
         Thread(target=self.call_at_interval, args=(period, callback, args)).start()
-        # mlab.show()
+        mlab.show()
 
     def make_particle_list(self):  # makes list of N particles
         particle_list = []
@@ -87,12 +87,12 @@ class MainCycle:
         self.total_potential_energy.append(total_potential_energy)
 
 
-    '''def update_plot(self):
+    def update_plot(self):
         for i in range(len(self.particle_list)):
             x = 0.05 * np.outer(np.cos(phi), np.sin(theta)) + self.particle_list[i].pos[-1][0]
             y = 0.05 * np.outer(np.sin(phi), np.sin(theta)) + self.particle_list[i].pos[-1][1]
             z = 0.05 * np.outer(np.ones(np.size(phi)), np.cos(theta)) + self.particle_list[i].pos[-1][2]
-            self.particle_plots[i].mlab_source.trait_set(x=x, y=y, z=z)'''
+            self.particle_plots[i].mlab_source.trait_set(x=x, y=y, z=z)
 
     def relax(arr, relax_mask):
         '''relaxation method used to fill in gaps in arrays'''
@@ -140,8 +140,8 @@ class MainCycle:
 
     def start_cycle(self, time_duration):
         self.set_positions()
-        # self.plot_sphere()
-        # self.plot_particles()
+        self.plot_sphere()
+        self.plot_particles()
         self.set_interval(self.delta_t, self.iterate_cycle, time_duration)
         positions, times = self.consolidate_min_pe_positions()
         print(positions.values(), times)
